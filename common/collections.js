@@ -1,3 +1,36 @@
+ReactionCore.Schemas.TransitTimesAddress = new SimpleSchema({
+  address1: {
+    type: String,
+    optional: true,
+    label: 'Address1'
+  },
+  address2: {
+    type: String,
+    optional: true,
+    label: 'Address2'
+  },
+  city: {
+    type: String,
+    optional: true,
+    label: 'City'
+  },
+  state: {
+    type: String,
+    optional: true,
+    label: 'State'
+  },
+  zipcode: {
+    type: String,
+    optional: true,
+    label: 'Zipcode'
+  },
+  countryCode: {
+    type: String,
+    optional: true,
+    label: 'Country Code (Two letter country code)'
+  }
+});
+
 ReactionCore.Schemas.TransitTimesPackageConfig = new SimpleSchema([
   ReactionCore.Schemas.PackageConfig, {
     'settings.fedex.key': {
@@ -52,6 +85,10 @@ ReactionCore.Schemas.TransitTimesPackageConfig = new SimpleSchema([
       label: 'Carrier to calculate transit time',
       optional: true,
       allowedValues: ['UPS', 'Fedex']
+    },
+    'settings.shippingAddress': {
+      type: ReactionCore.Schemas.TransitTimesAddress,
+      optional: true
     }
   }
 ]);

@@ -5,6 +5,11 @@ Package.describe({
   git: 'https://github.com/getoutfitted/transit-times'
 });
 
+Npm.depends({
+  'shipping-fedex': '0.1.4',
+  'shipping-ups': '0.5.4'
+});
+
 Package.onUse(function (api) {
   api.versionsFrom('METEOR@1.3');
   api.use('meteor-platform');
