@@ -2,7 +2,7 @@ Package.describe({
   summary: 'Transit Times Calculator',
   name: 'getoutfitted:transit-times',
   version: '0.1.0',
-  git: 'https://github.com/getoutfitted/product-bundles'
+  git: 'https://github.com/getoutfitted/transit-times'
 });
 
 Package.onUse(function (api) {
