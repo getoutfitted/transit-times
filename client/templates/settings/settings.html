@@ -7,7 +7,14 @@
         type="update"
         id="transit-times-update-form"
         }}
-
+    <p>Shipping From Location</p>
+    {{>afQuickField  name='settings.shippingAddress.address1'}}
+    {{>afQuickField  name='settings.shippingAddress.address2'}}
+    {{>afQuickField  name='settings.shippingAddress.city'}}
+    {{>afQuickField  name='settings.shippingAddress.state'}}
+    {{>afQuickField  name='settings.shippingAddress.zipcode'}}
+    {{>afQuickField  name='settings.shippingAddress.countryCode'}}
+    <br />
     <p>Choose Shipping Carrier To Calculate</p>
     {{>afQuickField  name='settings.selectedShipping' options="allowed"}}
     <br />
@@ -24,6 +31,8 @@
     {{>afQuickField  name='settings.fedex.key'}}
     {{>afQuickField  name='settings.fedex.accountNumber'}}
     {{>afQuickField  name='settings.fedex.meterNumber'}}
+    <br />
+
     <button type="submit" class="btn btn-primary pull-right">Save Changes</button>
       {{/autoForm}}
   </div>
