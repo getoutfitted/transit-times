@@ -1,3 +1,30 @@
 <template name='transitTimesSettings'>
-  <h1>Settings</h1>
+    <div class="panel-body">
+    {{#autoForm
+        collection="ReactionCore.Collections.Packages"
+        schema="ReactionCore.Schemas.TransitTimesPackageConfig"
+        doc=packageData
+        type="update"
+        id="transit-times-update-form"
+        }}
+
+    <p>Choose Shipping Carrier To Calculate</p>
+    {{>afQuickField  name='settings.selectedShipping' options="allowed"}}
+    <br />
+
+    <p>UPS Account Setup</p>
+    {{>afQuickField  name='settings.ups.liveApi'}}
+    {{>afQuickField  name='settings.ups.accessKey'}}
+    {{>afQuickField  name='settings.ups.username'}}
+    {{>afQuickField  name='settings.ups.password' type='password' }}
+    <br />
+    <p>Fedex Account Setup</p>
+    {{>afQuickField  name='settings.fedex.liveApi'}}
+    {{>afQuickField  name='settings.fedex.password'}}
+    {{>afQuickField  name='settings.fedex.key'}}
+    {{>afQuickField  name='settings.fedex.accountNumber'}}
+    {{>afQuickField  name='settings.fedex.meterNumber'}}
+    <button type="submit" class="btn btn-primary pull-right">Save Changes</button>
+      {{/autoForm}}
+  </div>
 </template>

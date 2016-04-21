@@ -17,6 +17,10 @@ Package.onUse(function (api) {
   api.use('momentjs:moment@2.10.6');
 
   api.addFiles([
+    'common/collections.js'
+  ], ['client', 'server']);
+
+  api.addFiles([
     'server/registry.js',
   ], 'server');
 
