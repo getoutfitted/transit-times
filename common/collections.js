@@ -126,7 +126,7 @@ ReactionCore.Schemas.TransitTimesPackageConfig = new SimpleSchema([
       label: 'UPS Password',
       optional: true
     },
-    'settings.selectedShipping': {
+    'settings.selectedShippingProvider': {
       type: String,
       label: 'Carrier to calculate transit time',
       optional: true,

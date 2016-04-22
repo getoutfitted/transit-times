@@ -29,7 +29,9 @@ Package.onUse(function (api) {
 
   api.addFiles([
     'common/collections.js',
-    'common/shipping.js'
+    'common/shipping.js',
+    'common/ups.js',
+    'common/fedex.js'
   ], ['client', 'server']);
 
   api.addFiles([
@@ -38,6 +40,10 @@ Package.onUse(function (api) {
     'client/templates/dashboard/dashboard.html',
     'client/templates/dashboard/dashboard.js'
   ], 'client');
+  
+  api.addFile([
+    'server/scraper.js'
+  ], 'server');
 
   api.export("TransitTimes");
 });
