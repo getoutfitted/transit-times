@@ -1,5 +1,5 @@
 Package.describe({
-  summary: 'Transit Times Calculator',
+  summary: 'Shipping Provider Transit Times Calculator',
   name: 'getoutfitted:transit-times',
   version: '0.1.0',
   git: 'https://github.com/getoutfitted/transit-times'
@@ -8,7 +8,8 @@ Package.describe({
 Npm.depends({
   'shipping-fedex': '0.1.4',
   'shipping-ups': '0.5.4',
-  'moment': '2.13.0'
+  'moment': '2.13.0',
+  'twix': '0.9.0'
 });
 
 Package.onUse(function (api) {
@@ -29,6 +30,7 @@ Package.onUse(function (api) {
 
   api.addFiles([
     'common/collections.js',
+    'common/legacyDateHelpers.js',
     'common/shipping.js',
     'common/ups.js',
     'common/fedex.js'

@@ -20,7 +20,7 @@ TransitTimes.getSelectedProvider = function () {
 
 TransitTimes.getDefaultTransitTime = function () {
   const settings = TransitTimes._getSettings();
-  return settings.buffer.shipping || 4;
+  return settings.defaultTransitTime || 4;
 };
 
 TransitTimes.getAPIAuth = function (provider) {
@@ -35,9 +35,24 @@ TransitTimes.getAPIAuth = function (provider) {
   throw new Meteor.Error(404, `Shipping provider ${provider} not found or setup`);
 };
 
+// What is this doing?
+TransitTimes.formatAddress = function (address) {
+  let shippingAddress = {};
+  shippingAddress.address1 = address.address1;
+  if (address.address2) {
+    shippingAddress.address2 = address.address2;
+  }
+  shippingAddress.city = address.city;
+  shippingAddress.region = address.region;
+  shippingAddress.postal = address.postal;
+  shippingAddress.country = address.country;
+  return shippingAddress;
+};
+
+
 TransitTimes.isLocalDelivery = function (postal) {
   check(postal, String);
-  return TransitTimes.LocalDelivery.postalCodes.includes(postal);
+  return _.contains(TransitTimes.LocalDelivery.postalCodes, postal);
 };
 
 /**
@@ -51,14 +66,14 @@ TransitTimes.calculateTransitTime = function (order) {
   const shippingAddress = order.shipping[0].address;
   const destinationPostal = shippingAddress.postal;
   const isLocalDelivery = TransitTimes.isLocalDelivery(destinationPostal);
-  if (localDelivery) {
+  if (isLocalDelivery) {
     return 0; // TransitTimes.localDeliveryTime()
   }
 
   const defaultTransitTime = TransitTimes.getDefaultTransitTime();
   const shippingProvider = TransitTimes.getSelectedProvider();
-  const transitTime = TransitTimes.findOne({postal: shippingAddress.postal});
-  const formattedShippingAddress = TransitTimes.addressFormatForFedExApi(shippingAddress);
+  const transitTime = TransitTimesCache.findOne({postal: shippingAddress.postal});
+  const formattedShippingAddress = TransitTimes.formatAddress(shippingAddress);
 
   if (shippingProvider === 'UPS') {
     if (transitTime) {

@@ -135,6 +135,10 @@ ReactionCore.Schemas.TransitTimesPackageConfig = new SimpleSchema([
     'settings.shippingAddress': {
       type: ReactionCore.Schemas.TransitTimesAddress,
       optional: true
+    },
+    'settings.defaultTransitTime': {
+      type: Number,
+      optional: true
     }
   }
 ]);
