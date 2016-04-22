@@ -41,7 +41,7 @@ Package.onUse(function (api) {
     'client/templates/dashboard/dashboard.js'
   ], 'client');
   
-  api.addFile([
+  api.addFiles([
     'server/scraper.js'
   ], 'server');
 
