@@ -7,11 +7,12 @@ Package.describe({
 
 Npm.depends({
   'shipping-fedex': '0.1.4',
-  'shipping-ups': '0.5.4'
+  'shipping-ups': '0.5.4',
+  'moment': '2.13.0'
 });
 
 Package.onUse(function (api) {
-  api.versionsFrom('METEOR@1.3');
+  api.versionsFrom('METEOR@1.3.1');
   api.use('meteor-platform');
   api.use('less');
   api.use('underscore');
@@ -19,15 +20,19 @@ Package.onUse(function (api) {
   api.use('reactioncommerce:core');
   api.use('reactioncommerce:reaction-router');
   api.use('reactioncommerce:reaction-collections');
-  api.use('momentjs:moment@2.10.6');
+
+  // Register package
+  api.addFiles('server/registry.js', 'server');
+
+  // Setup globals
+  api.addFiles('common/globals.js');
 
   api.addFiles([
-    'common/collections.js'
+    'common/collections.js',
+    'common/shipping.js',
+    'common/ups.js',
+    'common/fedex.js'
   ], ['client', 'server']);
-
-  api.addFiles([
-    'server/registry.js',
-  ], 'server');
 
   api.addFiles([
     'client/templates/settings/settings.html',
@@ -35,4 +40,10 @@ Package.onUse(function (api) {
     'client/templates/dashboard/dashboard.html',
     'client/templates/dashboard/dashboard.js'
   ], 'client');
+  
+  api.addFiles([
+    'server/scraper.js'
+  ], 'server');
+
+  api.export("TransitTimes");
 });
