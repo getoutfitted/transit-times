@@ -6,7 +6,7 @@ Package.describe({
 });
 
 Package.onUse(function (api) {
-  api.versionsFrom('METEOR@1.3');
+  api.versionsFrom('METEOR@1.3.1');
   api.use('meteor-platform');
   api.use('less');
   api.use('underscore');
@@ -14,11 +14,17 @@ Package.onUse(function (api) {
   api.use('reactioncommerce:core');
   api.use('reactioncommerce:reaction-router');
   api.use('reactioncommerce:reaction-collections');
-  api.use('momentjs:moment@2.10.6');
+
+  // Register package
+  api.addFiles('server/registry.js', 'server');
+
+  // Setup globals
+  api.addFiles('common/globals.js');
 
   api.addFiles([
-    'server/registry.js',
-  ], 'server');
+    'common/collections.js',
+    'common/shipping.js'
+  ], ['client', 'server']);
 
   api.addFiles([
     'client/templates/settings/settings.html',
@@ -26,4 +32,6 @@ Package.onUse(function (api) {
     'client/templates/dashboard/dashboard.html',
     'client/templates/dashboard/dashboard.js'
   ], 'client');
+  
+  api.export("TransitTimes");
 });
