@@ -5,6 +5,12 @@ Package.describe({
   git: 'https://github.com/getoutfitted/transit-times'
 });
 
+Npm.depends({
+  'shipping-fedex': '0.1.4',
+  'shipping-ups': '0.5.4',
+  'moment': '2.13.0'
+});
+
 Package.onUse(function (api) {
   api.versionsFrom('METEOR@1.3.1');
   api.use('meteor-platform');
@@ -32,6 +38,6 @@ Package.onUse(function (api) {
     'client/templates/dashboard/dashboard.html',
     'client/templates/dashboard/dashboard.js'
   ], 'client');
-  
+
   api.export("TransitTimes");
 });
