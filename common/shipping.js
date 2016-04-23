@@ -24,6 +24,11 @@ TransitTimes.getDefaultTransitTime = function () {
   return settings.defaultTransitTime || 4;
 };
 
+TransitTimes.getLocalDeliveryPostalCodes = function () {
+  const settings = TransitTimes._getSettings();
+  return settings.localDeliveryPostalCodes || [];
+};
+
 TransitTimes.getAPIAuth = function (provider) {
   const settings = TransitTimes._getSettings();
   if (provider === 'ups') {
@@ -53,7 +58,8 @@ TransitTimes.formatAddress = function (address) {
 
 TransitTimes.isLocalDelivery = function (postal) {
   check(postal, String);
-  return _.contains(TransitTimes.LocalDelivery.postalCodes, postal);
+  localPostalCodes = TransitTimes.getLocalDeliveryPostalCodes();
+  return _.contains(localPostalCodes, postal);
 };
 
 /**

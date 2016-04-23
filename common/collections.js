@@ -138,6 +138,10 @@ ReactionCore.Schemas.TransitTimesPackageConfig = new SimpleSchema([
     'settings.defaultTransitTime': {
       type: Number,
       optional: true
+    },
+    'settings.localDeliveryPostalCodes': {
+      type: [String],
+      optional: true
     }
   }
 ]);
