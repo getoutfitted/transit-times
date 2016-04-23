@@ -33,9 +33,9 @@ TransitTimes.date.previousBusinessDay = function (date) {
 TransitTimes.date.nextBusinessDay = function (date) {
   check(date, Date);
   if (this.isSunday(date)) {
-    return moment(date).add(1, 'days');
+    return moment(date).add(1, 'days').toDate();
   } else if (this.isSaturday(date)) {
-    return moment(date).add(2, 'days');
+    return moment(date).add(2, 'days').toDate();
   }
   return date;
 };

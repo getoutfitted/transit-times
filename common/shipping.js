@@ -80,7 +80,35 @@ TransitTimes.calculateTransitTime = function (order) {
   const defaultTransitTime = TransitTimes.getDefaultTransitTime();
   const shippingProvider = TransitTimes.getSelectedProvider();
   const transitTime = TransitTimesCache.findOne({postal: shippingAddress.postal});
-  console.log(transitTime);
+  const formattedShippingAddress = TransitTimes.formatAddress(shippingAddress);
+
+  if (shippingProvider === 'UPS') {
+    if (transitTime) {
+      return transitTime.upsTransitTime;
+    }
+    return TransitTimes.UPS.getUPSTransitTime(formattedShippingAddress) || defaultTransitTime;
+  }
+
+  if (shippingProvider === 'Fedex') {
+    if (transitTime) {
+      return transitTime.fedexTransitTime;
+    }
+    return TransitTimes.FedExApi.getFedexTransitTime(formattedShippingAddress) || defaultTransitTime;
+  }
+
+  return defaultTransitTime;
+};
+
+TransitTimes.calculateTransitTimeFromAddress = function (shippingAddress) {
+  const destinationPostal = shippingAddress.postal;
+  const isLocalDelivery = TransitTimes.isLocalDelivery(destinationPostal);
+  if (isLocalDelivery) {
+    return 0; // TransitTimes.localDeliveryTime()
+  }
+
+  const defaultTransitTime = TransitTimes.getDefaultTransitTime();
+  const shippingProvider = TransitTimes.getSelectedProvider();
+  const transitTime = TransitTimesCache.findOne({postal: shippingAddress.postal});
   const formattedShippingAddress = TransitTimes.formatAddress(shippingAddress);
 
   if (shippingProvider === 'UPS') {
