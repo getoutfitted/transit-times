@@ -1,5 +1,4 @@
-ReactionCore.Collections.TransitTimesCache = new Mongo.Collection('TransitTimesCache');
-TransitTimesCache = ReactionCore.Collections.TransitTimesCache;
+ReactionCore.Collections.TransitTimesCache = new Mongo.Collection('TransitTimes');
 
 ReactionCore.Schemas.TransitTimesCache = new SimpleSchema({
   postal: {

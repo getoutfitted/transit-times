@@ -1,4 +1,5 @@
 import moment from 'moment';
+TransitTimesCache = ReactionCore.Collections.TransitTimesCache;
 
 TransitTimes._getSettings = function () {
   const tt = ReactionCore.Collections.Packages.findOne({
@@ -73,6 +74,7 @@ TransitTimes.calculateTransitTime = function (order) {
   const defaultTransitTime = TransitTimes.getDefaultTransitTime();
   const shippingProvider = TransitTimes.getSelectedProvider();
   const transitTime = TransitTimesCache.findOne({postal: shippingAddress.postal});
+  console.log(transitTime);
   const formattedShippingAddress = TransitTimes.formatAddress(shippingAddress);
 
   if (shippingProvider === 'UPS') {
@@ -114,6 +116,29 @@ TransitTimes.calculateShippingDay = function (order) {
   return shippingDay.toDate();
 };
 
+TransitTimes.calculateTotalShippingDays = function (order) {
+  let start = moment(order.startTime);
+  let days = 0;
+  if (start.isoWeekday() === 6) {
+    days = days + 1;
+  } else if (start.isoWeekday() === 7) {
+    days = days + 2;
+  }
+
+  let timeInTransit = TransitTimes.calculateTransitTime(order);
+  if (timeInTransit === 0) {
+    return 0;
+  }
+  days = days + timeInTransit;
+
+  let shippingDay = moment(start).subtract(days, 'days');
+
+  if (shippingDay.isoWeekday() + timeInTransit >= 6) {
+    days = days + 2;
+  }
+  return days;
+};
+
 // Calculates the day an order should return to the warehouse
 TransitTimes.calculateReturnDay = function (order) {
   let end = moment(order.endTime);
@@ -136,4 +161,28 @@ TransitTimes.calculateReturnDay = function (order) {
     return returnDay.add(2, 'days').toDate();
   }
   return returnDay.toDate();
+};
+
+// Calculates the day an order should return to the warehouse
+TransitTimes.calculateTotalReturnDays = function (order) {
+  let end = moment(order.endTime);
+  let days = 0;
+  if (end.isoWeekday() === 6) {
+    days = days + 2;
+  } else if (end.isoWeekday() === 7) {
+    days = days + 1;
+  }
+
+  let timeInTransit = TransitTimes.calculateTransitTime(order);
+
+  if (timeInTransit === 0) {
+    return end.toDate();
+  }
+
+  let dropoffDay = moment(end).add(days, 'days');
+  days = days + timeInTransit;
+  if (dropoffDay.isoWeekday() + timeInTransit >= 6) {
+    days = days + 2;
+  }
+  return days;
 };
