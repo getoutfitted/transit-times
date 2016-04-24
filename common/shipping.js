@@ -66,70 +66,52 @@ TransitTimes.isLocalDelivery = function (postal) {
  * Calculates the time in transit for an order
  * Calculation is based on the destination of the order,
  * the shipping location and the provider used for shipping.
- * @param   {Object} order a ReactionCommerce order object
+ * @param   {Object} shippingAddress a ReactionCommerce order shipping address
  * @returns {Number}       number of business days in transit
  */
-TransitTimes.calculateTransitTime = function (order) {
+TransitTimes.calculateTransitTime = function (shippingAddress) {
+  const destinationPostal = shippingAddress.postal;
+  const isLocalDelivery = TransitTimes.isLocalDelivery(destinationPostal);
+  if (isLocalDelivery) {
+    return 0; // TransitTimes.localDeliveryTime()
+  }
+
+  const defaultTransitTime = TransitTimes.getDefaultTransitTime();
+  const shippingProvider = TransitTimes.getSelectedProvider();
+  const transitTime = TransitTimesCache.findOne({
+    postal: shippingAddress.postal
+  });
+  const formattedShippingAddress = TransitTimes.formatAddress(shippingAddress);
+
+  if (shippingProvider === 'UPS') {
+    if (transitTime) {
+      return transitTime.upsTransitTime;
+    }
+    return TransitTimes.UPS.getUPSTransitTime(formattedShippingAddress) || defaultTransitTime;
+  }
+
+  if (shippingProvider === 'Fedex') {
+    if (transitTime) {
+      return transitTime.fedexTransitTime;
+    }
+    return TransitTimes.FedExApi.getFedexTransitTime(formattedShippingAddress) || defaultTransitTime;
+  }
+
+  return defaultTransitTime;
+};
+
+
+TransitTimes.calculateTransitTimeByOrder = function (order) {
   const shippingAddress = order.shipping[0].address;
-  const destinationPostal = shippingAddress.postal;
-  const isLocalDelivery = TransitTimes.isLocalDelivery(destinationPostal);
-  if (isLocalDelivery) {
-    return 0; // TransitTimes.localDeliveryTime()
-  }
-
-  const defaultTransitTime = TransitTimes.getDefaultTransitTime();
-  const shippingProvider = TransitTimes.getSelectedProvider();
-  const transitTime = TransitTimesCache.findOne({postal: shippingAddress.postal});
-  const formattedShippingAddress = TransitTimes.formatAddress(shippingAddress);
-
-  if (shippingProvider === 'UPS') {
-    if (transitTime) {
-      return transitTime.upsTransitTime;
-    }
-    return TransitTimes.UPS.getUPSTransitTime(formattedShippingAddress) || defaultTransitTime;
-  }
-
-  if (shippingProvider === 'Fedex') {
-    if (transitTime) {
-      return transitTime.fedexTransitTime;
-    }
-    return TransitTimes.FedExApi.getFedexTransitTime(formattedShippingAddress) || defaultTransitTime;
-  }
-
-  return defaultTransitTime;
+  return TransitTimes.calculateTransitTime(shippingAddress);
 };
 
-TransitTimes.calculateTransitTimeFromAddress = function (shippingAddress) {
-  const destinationPostal = shippingAddress.postal;
-  const isLocalDelivery = TransitTimes.isLocalDelivery(destinationPostal);
-  if (isLocalDelivery) {
-    return 0; // TransitTimes.localDeliveryTime()
+TransitTimes.calculateShippingDay = function (startTime, timeInTransit) {
+  if (timeInTransit === 0) {
+    return startTime;
   }
 
-  const defaultTransitTime = TransitTimes.getDefaultTransitTime();
-  const shippingProvider = TransitTimes.getSelectedProvider();
-  const transitTime = TransitTimesCache.findOne({postal: shippingAddress.postal});
-  const formattedShippingAddress = TransitTimes.formatAddress(shippingAddress);
-
-  if (shippingProvider === 'UPS') {
-    if (transitTime) {
-      return transitTime.upsTransitTime;
-    }
-    return TransitTimes.UPS.getUPSTransitTime(formattedShippingAddress) || defaultTransitTime;
-  }
-
-  if (shippingProvider === 'Fedex') {
-    if (transitTime) {
-      return transitTime.fedexTransitTime;
-    }
-    return TransitTimes.FedExApi.getFedexTransitTime(formattedShippingAddress) || defaultTransitTime;
-  }
-
-  return defaultTransitTime;
-};
-
-TransitTimes.calculateShippingDay = function (order) {
-  let start = moment(order.startTime);
+  let start = moment(startTime);
   let weekendArrivalDays = 0;
   if (start.isoWeekday() === 6) {
     weekendArrivalDays = weekendArrivalDays + 1;
@@ -137,11 +119,6 @@ TransitTimes.calculateShippingDay = function (order) {
     weekendArrivalDays = weekendArrivalDays + 2;
   }
 
-  let timeInTransit = TransitTimes.calculateTransitTime(order);
-
-  if (timeInTransit === 0) {
-    return start.toDate();
-  }
 
   let shippingDay = moment(start).subtract(timeInTransit + weekendArrivalDays, 'days');
   if (shippingDay.isoWeekday() + timeInTransit >= 6) {
@@ -150,8 +127,21 @@ TransitTimes.calculateShippingDay = function (order) {
   return shippingDay.toDate();
 };
 
-TransitTimes.calculateTotalShippingDays = function (order) {
-  let start = moment(order.startTime);
+TransitTimes.calculateShippingDayByOrder = function (order) {
+  return TransitTimes.calculateShippingDay(
+    order.startTime,
+    TransitTimes.calculateTransitTime(order)
+  );
+};
+
+TransitTimes.calculateTotalShippingDays = function (startTime, timeInTransit) {
+  check(startTime, Date);
+  check(timeInTransit, Number);
+  if (timeInTransit === 0) {
+    return 0;
+  }
+
+  let start = moment(startTime);
   let days = 0;
   if (start.isoWeekday() === 6) {
     days = days + 1;
@@ -159,34 +149,37 @@ TransitTimes.calculateTotalShippingDays = function (order) {
     days = days + 2;
   }
 
-  let timeInTransit = TransitTimes.calculateTransitTime(order);
-  if (timeInTransit === 0) {
-    return 0;
-  }
   days = days + timeInTransit;
-
   let shippingDay = moment(start).subtract(days, 'days');
-
   if (shippingDay.isoWeekday() + timeInTransit >= 6) {
     days = days + 2;
   }
   return days;
 };
 
+TransitTimes.calculateTotalShippingDaysByOrder = function (order) {
+  return TransitTimes.calculateTotalShippingDays(
+    order.startTime,
+    TransitTimes.calculateTransitTime(order)
+  );
+};
+
+
 // Calculates the day an order should return to the warehouse
-TransitTimes.calculateReturnDay = function (order) {
-  let end = moment(order.endTime);
+TransitTimes.calculateReturnDay = function (endTime, timeInTransit) {
+  check(endTime, Date);
+  check(timeInTransit, Number);
+
+  if (timeInTransit === 0) {
+    return endTime;
+  }
+
+  let end = moment(endTime);
   let weekendReturnDays = 0;
   if (end.isoWeekday() === 6) {
     weekendReturnDays = weekendReturnDays + 2;
   } else if (end.isoWeekday() === 7) {
     weekendReturnDays = weekendReturnDays + 1;
-  }
-
-  let timeInTransit = TransitTimes.calculateTransitTime(order);
-
-  if (timeInTransit === 0) {
-    return end.toDate();
   }
 
   let dropoffDay = moment(end).add(weekendReturnDays, 'days');
@@ -198,19 +191,28 @@ TransitTimes.calculateReturnDay = function (order) {
 };
 
 // Calculates the day an order should return to the warehouse
-TransitTimes.calculateTotalReturnDays = function (order) {
-  let end = moment(order.endTime);
+TransitTimes.calculateReturnDayByOrder = function (order) {
+  return TransitTimes.calculateReturnDay(
+    order.endTime,
+    TransitTimes.calculateTransitTime(order)
+  );
+};
+
+// Calculates the day an order should return to the warehouse
+TransitTimes.calculateTotalReturnDays = function (endTime, timeInTransit) {
+  check(endTime, Date);
+  check(timeInTransit, Number);
+
+  if (timeInTransit === 0) {
+    return 0;
+  }
+
+  let end = moment(endTime);
   let days = 0;
   if (end.isoWeekday() === 6) {
     days = days + 2;
   } else if (end.isoWeekday() === 7) {
     days = days + 1;
-  }
-
-  let timeInTransit = TransitTimes.calculateTransitTime(order);
-
-  if (timeInTransit === 0) {
-    return end.toDate();
   }
 
   let dropoffDay = moment(end).add(days, 'days');
@@ -219,4 +221,12 @@ TransitTimes.calculateTotalReturnDays = function (order) {
     days = days + 2;
   }
   return days;
+};
+
+// Calculates the day an order should return to the warehouse
+TransitTimes.calculateTotalReturnDaysByOrder = function (order) {
+  return TransitTimes.calculateTotalReturnDays(
+    order.endTime,
+    TransitTimes.calculateTransitTimeByOrder(order)
+  );
 };
