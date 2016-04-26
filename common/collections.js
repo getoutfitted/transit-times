@@ -1,5 +1,4 @@
-ReactionCore.Collections.TransitTimesCache = new Mongo.Collection('TransitTimesCache');
-TransitTimesCache = ReactionCore.Collections.TransitTimesCache;
+ReactionCore.Collections.TransitTimesCache = new Mongo.Collection('TransitTimes');
 
 ReactionCore.Schemas.TransitTimesCache = new SimpleSchema({
   postal: {
@@ -134,6 +133,14 @@ ReactionCore.Schemas.TransitTimesPackageConfig = new SimpleSchema([
     },
     'settings.shippingAddress': {
       type: ReactionCore.Schemas.TransitTimesAddress,
+      optional: true
+    },
+    'settings.defaultTransitTime': {
+      type: Number,
+      optional: true
+    },
+    'settings.localDeliveryPostalCodes': {
+      type: [String],
       optional: true
     }
   }

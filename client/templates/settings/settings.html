@@ -15,9 +15,19 @@
     {{>afQuickField  name='settings.shippingAddress.zipcode'}}
     {{>afQuickField  name='settings.shippingAddress.countryCode'}}
     <br />
+
+    <p>List of postal codes that can be delivered to same-day</p>
+      {{>afQuickField  name='settings.localDeliveryPostalCodes'}}
+    <br />
+
     <p>Choose Shipping Carrier To Calculate</p>
     {{>afQuickField  name='settings.selectedShippingProvider' options="allowed"}}
     <br />
+
+    <p>Choose Shipping Carrier To Calculate</p>
+    {{>afQuickField  name='settings.defaultTransitTime' type='number'}}
+    <br />
+
 
     <p>UPS Account Setup</p>
     {{>afQuickField  name='settings.ups.liveApi'}}
