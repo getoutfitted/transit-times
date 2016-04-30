@@ -130,12 +130,12 @@ TransitTimes.calculateShippingDay = function (startTime, timeInTransit) {
 TransitTimes.calculateShippingDayByOrder = function (order) {
   return TransitTimes.calculateShippingDay(
     order.startTime,
-    TransitTimes.calculateTransitTime(order)
+    TransitTimes.calculateTransitTimeByOrder(order)
   );
 };
 
 TransitTimes.calculateTotalShippingDays = function (startTime, timeInTransit) {
-  check(startTime, Date);
+  check(startTime, Match.Optional(Date));
   check(timeInTransit, Number);
   if (timeInTransit === 0) {
     return 0;
@@ -160,14 +160,14 @@ TransitTimes.calculateTotalShippingDays = function (startTime, timeInTransit) {
 TransitTimes.calculateTotalShippingDaysByOrder = function (order) {
   return TransitTimes.calculateTotalShippingDays(
     order.startTime,
-    TransitTimes.calculateTransitTime(order)
+    TransitTimes.calculateTransitTimeByOrder(order)
   );
 };
 
 
 // Calculates the day an order should return to the warehouse
 TransitTimes.calculateReturnDay = function (endTime, timeInTransit) {
-  check(endTime, Date);
+  check(endTime, Match.Optional(Date));
   check(timeInTransit, Number);
 
   if (timeInTransit === 0) {
@@ -194,13 +194,13 @@ TransitTimes.calculateReturnDay = function (endTime, timeInTransit) {
 TransitTimes.calculateReturnDayByOrder = function (order) {
   return TransitTimes.calculateReturnDay(
     order.endTime,
-    TransitTimes.calculateTransitTime(order)
+    TransitTimes.calculateTransitTimeByOrder(order)
   );
 };
 
 // Calculates the day an order should return to the warehouse
 TransitTimes.calculateTotalReturnDays = function (endTime, timeInTransit) {
-  check(endTime, Date);
+  check(endTime, Match.Optional(Date));
   check(timeInTransit, Number);
 
   if (timeInTransit === 0) {
