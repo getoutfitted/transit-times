@@ -1,5 +1,5 @@
 ReactionCore.registerPackage({
-  label: 'GetOutfitted Transit Time Calculator',
+  label: 'Transit Time Calculator',
   name: 'transit-times',
   icon: 'fa fa-calculator',
   autoEnable: false,
