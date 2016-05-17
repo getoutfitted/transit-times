@@ -2,7 +2,7 @@ ReactionCore.registerPackage({
   label: 'Transit Time Calculator',
   name: 'transit-times',
   icon: 'fa fa-calculator',
-  autoEnable: false,
+  autoEnable: true,
   settings: {},
   registry: [{
     route: '/dashboard/transit-times',
