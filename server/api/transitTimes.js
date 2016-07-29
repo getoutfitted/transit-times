@@ -241,5 +241,3 @@ TransitTimes.calculateTotalReturnDaysByOrder = function (order) {
     TransitTimes.calculateTransitTimeByOrder(order)
   );
 };
-console.log('transit', TransitTimes);
-
