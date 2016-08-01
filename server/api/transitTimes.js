@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import { _ } from 'meteor/underscore';
 import moment from 'moment';
 import { Meteor } from 'meteor/meteor';
 import { TransitTimesCache } from '../../lib/collections';
