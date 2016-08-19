@@ -14,7 +14,7 @@ Reaction.registerPackage({
     container: 'getoutfitted',
     icon: 'fa fa-calculator',
     template: 'transitTimesDashboard',
-    workflow: 'transtTimesWorkflow',
+    workflow: 'transitTimesWorkflow',
     priority: 3
   }, {
     route: '/dashboard/transit-times/settings',
