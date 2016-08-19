@@ -1,8 +1,8 @@
 <template name='transitTimesSettings'>
     <div class="panel-body">
     {{#autoForm
-        collection="ReactionCore.Collections.Packages"
-        schema="ReactionCore.Schemas.TransitTimesPackageConfig"
+        collection=Collections.Packages
+        schema=TransitTimesPackageConfig
         doc=packageData
         type="update"
         id="transit-times-update-form"

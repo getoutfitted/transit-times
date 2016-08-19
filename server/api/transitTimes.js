@@ -1,16 +1,27 @@
+import { _ } from 'meteor/underscore';
 import moment from 'moment';
-TransitTimesCache = ReactionCore.Collections.TransitTimesCache;
+import { Meteor } from 'meteor/meteor';
+import { TransitTimesCache } from '../../lib/collections';
+import { Packages } from '/lib/collections';
+import { getShopId } from '/lib/api';
+import { FedExApi } from './transitOptions/fedex';
+import { UPS } from './transitOptions/ups';
+import { dateHelper } from './transitOptions/dateHelpers';
+
+export const TransitTimes = {
+  FedExApi: FedExApi,
+  date: dateHelper,
+  UPS: UPS
+};
 
 TransitTimes._getSettings = function () {
-  const tt = ReactionCore.Collections.Packages.findOne({
+  const tt = Packages.findOne({
     name: 'transit-times',
-    shopId: ReactionCore.getShopId()
+    shopId: getShopId()
   });
-
   if (!tt) {
-    throw new Meteor.Error(500, "TransitTimes package not found ");
+    throw new Meteor.Error(500, 'TransitTimes package not found');
   }
-
   return tt.settings;
 };
 
@@ -87,7 +98,7 @@ TransitTimes.calculateTransitTime = function (shippingAddress) {
     if (transitTime) {
       return transitTime.upsTransitTime;
     }
-    return TransitTimes.UPS.getUPSTransitTime(formattedShippingAddress) || defaultTransitTime;
+    return UPS.getUPSTransitTime(formattedShippingAddress) || defaultTransitTime;
   }
 
   if (shippingProvider === 'Fedex') {

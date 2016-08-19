@@ -1,25 +1,27 @@
+import { check } from 'meteor/check';
 import moment from 'moment';
 import 'twix';
 
-TransitTimes.date = {};
 
-TransitTimes.date.isWeekend = function (date) {
+export const dateHelper = {};
+
+dateHelper.isWeekend = function (date) {
   check(date, Date);
   return moment(date).isoWeekday() === 7 || moment(date).isoWeekday() === 6;
 };
 
-TransitTimes.date.isSunday = function (date) {
+dateHelper.isSunday = function (date) {
   check(date, Date);
   return moment(date).isoWeekday() === 7;
 };
 
-TransitTimes.date.isSaturday = function (date) {
+dateHelper.isSaturday = function (date) {
   check(date, Date);
   return moment(date).isoWeekday() === 6;
 };
 
 // This feels a bit misleading as it returns the current day unless it's a weekend.
-TransitTimes.date.previousBusinessDay = function (date) {
+dateHelper.previousBusinessDay = function (date) {
   check(date, Date);
   if (this.isSunday(date)) {
     return moment(date).subtract(2, 'days');
@@ -30,7 +32,7 @@ TransitTimes.date.previousBusinessDay = function (date) {
 };
 
 // Name and return value don't really match here
-TransitTimes.date.nextBusinessDay = function (date) {
+dateHelper.nextBusinessDay = function (date) {
   check(date, Date);
   if (this.isSunday(date)) {
     return moment(date).add(1, 'days').toDate();
@@ -40,23 +42,23 @@ TransitTimes.date.nextBusinessDay = function (date) {
   return date;
 };
 
-TransitTimes.date.ifWeekendSetPreviousBizDay = function (date) {
+dateHelper.ifWeekendSetPreviousBizDay = function (date) {
   check(date, Date);
-  if (TransitTimes.date.isWeekend(date)) {
-    date = TransitTimes.date.previousBusinessDay(date);
+  if (dateHelper.isWeekend(date)) {
+    date = dateHelper.previousBusinessDay(date);
   }
   return moment(date);
 };
 
-TransitTimes.date.ifWeekendSetNextBizDay = function (date) {
+dateHelper.ifWeekendSetNextBizDay = function (date) {
   check(date, Date);
-  if (TransitTimes.date.isWeekend(date)) {
-    date = TransitTimes.date.nextBusinessDay(date);
+  if (dateHelper.isWeekend(date)) {
+    date = dateHelper.nextBusinessDay(date);
   }
   return moment(date);
 };
 
-TransitTimes.date.enoughBizDaysForTransit = function (startDate, endDate, transitTime) {
+dateHelper.enoughBizDaysForTransit = function (startDate, endDate, transitTime) {
   check(startDate, Date);
   check(endDate, Date);
   check(transitTime, Number);
@@ -72,42 +74,42 @@ TransitTimes.date.enoughBizDaysForTransit = function (startDate, endDate, transi
   return bizDays >= transitTime;
 };
 
-TransitTimes.date.determineShipReturnByDate = function (endTime) {
+dateHelper.determineShipReturnByDate = function (endTime) {
   check(endTime, Date);
   let shipReturnBy = moment(endTime).add(1, 'day');
-  shipReturnBy = TransitTimes.date.ifWeekendSetNextBizDay(shipReturnBy.toDate());
+  shipReturnBy = dateHelper.ifWeekendSetNextBizDay(shipReturnBy.toDate());
   return shipReturnBy.toDate();
 };
 
-TransitTimes.date.determineArrivalDate = function (startTime) {
+dateHelper.determineArrivalDate = function (startTime) {
   check(startTime, Date);
   let arrivalDate = moment(startTime).subtract(1, 'day');
-  arrivalDate = TransitTimes.date.ifWeekendSetPreviousBizDay(arrivalDate.toDate());
+  arrivalDate = dateHelper.ifWeekendSetPreviousBizDay(arrivalDate.toDate());
   return arrivalDate.toDate();
 };
 
-TransitTimes.date.determineShipmentDate = function (arrivalDate, transitTime) {
+dateHelper.determineShipmentDate = function (arrivalDate, transitTime) {
   check(arrivalDate, Date);
   check(transitTime, Number);
   let shipmentDate = moment(arrivalDate).subtract(transitTime, 'days');
   let enoughTransitTime = false;
   while (enoughTransitTime === false) {
-    enoughTransitTime = TransitTimes.date.enoughBizDaysForTransit(shipmentDate.toDate(), arrivalDate, transitTime);
+    enoughTransitTime = dateHelper.enoughBizDaysForTransit(shipmentDate.toDate(), arrivalDate, transitTime);
     shipmentDate = moment(shipmentDate).subtract(1, 'day');
   }
-  shipmentDate = TransitTimes.date.ifWeekendSetPreviousBizDay(shipmentDate.toDate());
+  shipmentDate = dateHelper.ifWeekendSetPreviousBizDay(shipmentDate.toDate());
   return shipmentDate.toDate();
 };
 
-TransitTimes.date.determineReturnDate = function (shipReturnBy, transitTime) {
+dateHelper.determineReturnDate = function (shipReturnBy, transitTime) {
   check(shipReturnBy, Date);
   check(transitTime, Number);
   let returnDate = moment(shipReturnBy).add(transitTime, 'days');
   let enoughTransitTime = false;
   while (enoughTransitTime === false) {
-    enoughTransitTime = TransitTimes.date.enoughBizDaysForTransit(shipReturnBy, returnDate.toDate(), transitTime);
+    enoughTransitTime = dateHelper.enoughBizDaysForTransit(shipReturnBy, returnDate.toDate(), transitTime);
     returnDate = moment(returnDate).add(1, 'day');
   }
-  returnDate = TransitTimes.date.ifWeekendSetNextBizDay(returnDate.toDate());
+  returnDate = dateHelper.ifWeekendSetNextBizDay(returnDate.toDate());
   return returnDate.toDate();
 };

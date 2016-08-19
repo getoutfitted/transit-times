@@ -1,8 +1,18 @@
+import { Template } from 'meteor/templating';
+import { Reaction } from '/client/api';
+import { Packages } from '/lib/collections';
+import { TransitTimesPackageConfig } from '../../../lib/collections/schemas';
+
+import './settings.html';
+
 Template.transitTimesSettings.helpers({
-  packageData: function () {
-    return ReactionCore.Collections.Packages.findOne({
+  TransitTimesPackageConfig() {
+    return TransitTimesPackageConfig;
+  },
+  packageData() {
+    return Packages.findOne({
       name: 'transit-times',
-      shopId: ReactionCore.getShopId()
+      shopId: Reaction.getShopId()
     });
   }
 });

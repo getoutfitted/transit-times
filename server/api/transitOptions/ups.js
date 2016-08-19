@@ -1,9 +1,12 @@
 // UPS = Npm.require('shipping-ups');
-import UPS from 'shipping-ups';
+import upsAPI from 'shipping-ups';
+import { Logger } from '/server/api';
+import { Meteor } from 'meteor/meteor';
+import { getAPIAuth } from './helpers';
 
-TransitTimes.UPS = {};
+export const UPS = {};
 
-TransitTimes.UPS.getUPSTransitTime = function (address) {
+UPS.getUPSTransitTime = function (address) {
   check(address, {
     address1: String,
     address2: Match.Optional(String),
@@ -14,12 +17,12 @@ TransitTimes.UPS.getUPSTransitTime = function (address) {
     postal: String,
     country: String
   });
-  const auth = TransitTimes.getAPIAuth('ups');
+  const auth = getAPIAuth('ups');
   if (!auth) {
     return false;
   }
-  
-  let ups = new UPS({
+
+  let ups = new upsAPI({
     environment: 'sandbox', // or live
     username: auth.username,
     password: auth.password,
@@ -59,6 +62,7 @@ TransitTimes.UPS.getUPSTransitTime = function (address) {
   }
 
   // Back up if transit time fails
-  ReactionCore.Log.warn('UPS Transit Time Not Calculated for ' + address);
+  Logger.warn('UPS Transit Time Not Calculated for ' + address);
   return false;
 };
+
